@@ -1,5 +1,4 @@
 
-import { ShoppingBasket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface LogoProps {
@@ -14,14 +13,23 @@ const Logo = ({ size = 'medium', showTagline = false }: LogoProps) => {
     large: 'text-3xl gap-3'
   };
 
+  const logoSizes = {
+    small: 30,
+    medium: 40,
+    large: 50
+  };
+
   return (
     <div className="flex flex-col items-start">
       <Link to="/" className={`flex items-center ${sizeClasses[size]}`}>
-        <div className="relative">
-          <ShoppingBasket className="text-appgold" size={size === 'small' ? 24 : size === 'medium' ? 30 : 36} />
-          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-appgold rounded-full border border-appbg"></div>
-        </div>
-        <div className="flex items-center">
+        <img 
+          src="/lovable-uploads/08918244-9efb-4ffc-afbe-66502b0eac7d.png" 
+          alt="Groocease Logo" 
+          width={logoSizes[size]} 
+          height={logoSizes[size]} 
+          className="rounded-lg"
+        />
+        <div className="flex items-center ml-2">
           <span className="font-bold text-appgold">Groc</span>
           <span className="font-bold text-appfg">Merchants</span>
         </div>

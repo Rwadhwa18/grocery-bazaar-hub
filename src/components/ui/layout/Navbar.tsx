@@ -1,9 +1,9 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Bell, Search, User, Menu, X } from 'lucide-react';
+import { ShoppingCart, Bell, Search, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/auth/AuthModal';
+import Logo from './Logo';
 
 const Navbar = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -24,11 +24,8 @@ const Navbar = () => {
       <header className="w-full bg-appbg sticky top-0 z-50 border-b border-appgray">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            {/* Logo and Brand */}
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-appgold">Grocery</span>
-              <span className="text-2xl font-bold text-appfg">Bazaar</span>
-            </Link>
+            {/* Logo */}
+            <Logo />
 
             {/* Search Bar - Desktop */}
             <div className={`hidden md:flex items-center flex-1 mx-8 relative ${isSearchFocused ? 'ring-2 ring-appgold' : ''}`}>

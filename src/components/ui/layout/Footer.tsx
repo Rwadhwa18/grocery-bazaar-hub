@@ -85,14 +85,14 @@ const Footer = () => {
               </li>
               <li className="flex items-center">
                 <Mail size={20} className="text-appgold mr-2 flex-shrink-0" />
-                <span className="text-gray-400">support@grocerybazaar.com</span>
+                <span className="text-gray-400">support@grocmerchants.com</span>
               </li>
             </ul>
           </div>
         </div>
         
         <div className="border-t border-appgray/50 mt-8 pt-8 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} Grocery Bazaar. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} GrocMerchants. All rights reserved.</p>
         </div>
       </div>
     </footer>

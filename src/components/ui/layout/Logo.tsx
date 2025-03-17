@@ -22,8 +22,8 @@ const Logo = ({ size = 'medium', showTagline = false }: LogoProps) => {
           <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-appgold rounded-full border border-appbg"></div>
         </div>
         <div className="flex items-center">
-          <span className="font-bold text-appgold">Grocery</span>
-          <span className="font-bold text-appfg">Bazaar</span>
+          <span className="font-bold text-appgold">Groc</span>
+          <span className="font-bold text-appfg">Merchants</span>
         </div>
       </Link>
       {showTagline && (

@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo and About */}
           <div className="space-y-4">
-            <Logo size="large" />
+            <Logo size="large" showTagline={true} />
             <p className="text-gray-400 mt-4">
               Your one-stop shop for fresh groceries and everyday essentials, delivered right to your doorstep.
             </p>

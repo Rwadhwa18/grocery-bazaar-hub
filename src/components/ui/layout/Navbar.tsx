@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart, Bell, Search, Menu, X } from 'lucide-react';
@@ -25,7 +26,7 @@ const Navbar = () => {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Logo />
+            <Logo showTagline={true} />
 
             {/* Search Bar - Desktop */}
             <div className={`hidden md:flex items-center flex-1 mx-8 relative ${isSearchFocused ? 'ring-2 ring-appgold' : ''}`}>

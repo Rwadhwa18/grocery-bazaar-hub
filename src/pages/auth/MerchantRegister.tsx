@@ -29,11 +29,12 @@ const MerchantRegister = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
-        title: "Merchant registration successful",
-        description: "Your merchant account is under review. We'll notify you once it's approved.",
+        title: "Registration successful",
+        description: "You can now set up your store",
       });
       
-      navigate('/merchant/login');
+      // Redirect to merchant setup page instead of login
+      navigate('/merchant/setup');
     } catch (error) {
       toast({
         title: "Registration failed",

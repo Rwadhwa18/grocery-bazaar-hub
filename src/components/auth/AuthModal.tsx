@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { UserRole } from '@/lib/types';
 import { User, Lock, MapPin, Mail, Store, UserPlus } from 'lucide-react';
+import GoogleLoginButton from './GoogleLoginButton';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -18,6 +20,7 @@ interface AuthModalProps {
 const AuthModal = ({ isOpen, onClose, initialView }: AuthModalProps) => {
   const [role, setRole] = useState<UserRole>('customer');
   const [activeTab, setActiveTab] = useState(initialView);
+  const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +34,15 @@ const AuthModal = ({ isOpen, onClose, initialView }: AuthModalProps) => {
     // Simulate register
     console.log('Register attempted as', role);
     onClose();
+  };
+
+  const handleGoogleSuccess = () => {
+    onClose();
+    if (role === 'merchant') {
+      navigate('/merchant/dashboard');
+    } else {
+      navigate('/');
+    }
   };
 
   return (
@@ -86,6 +98,20 @@ const AuthModal = ({ isOpen, onClose, initialView }: AuthModalProps) => {
               <Button type="submit" className="w-full app-button">
                 Login
               </Button>
+              
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-500/30"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-appgray px-2 text-gray-400">OR</span>
+                </div>
+              </div>
+              
+              <GoogleLoginButton 
+                userType={role} 
+                onSuccess={handleGoogleSuccess} 
+              />
               
               <div className="text-center text-sm text-gray-400 mt-4">
                 Don't have an account?{' '}
@@ -184,6 +210,20 @@ const AuthModal = ({ isOpen, onClose, initialView }: AuthModalProps) => {
                 <UserPlus size={18} />
                 Create Account
               </Button>
+              
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-500/30"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-appgray px-2 text-gray-400">OR</span>
+                </div>
+              </div>
+              
+              <GoogleLoginButton 
+                userType={role} 
+                onSuccess={handleGoogleSuccess} 
+              />
               
               <div className="text-center text-sm text-gray-400 mt-4">
                 Already have an account?{' '}

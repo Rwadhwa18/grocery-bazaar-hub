@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { Mail, Lock, Store } from 'lucide-react';
 import AuthLayout from './AuthLayout';
+import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 
 const MerchantLogin = () => {
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ const MerchantLogin = () => {
       
       toast({
         title: "Merchant login successful",
-        description: "Welcome back to your merchant dashboard!",
+        description: "Welcome back to GrocMerchants!",
       });
       
       navigate('/merchant/dashboard');
@@ -89,10 +90,24 @@ const MerchantLogin = () => {
         </div>
         
         <Button type="submit" className="w-full app-button" disabled={isLoading}>
-          {isLoading ? 'Logging in...' : 'Login as Merchant'}
+          {isLoading ? 'Logging in...' : 'Login'}
         </Button>
         
-        <div className="text-center text-sm text-gray-400 mt-4">
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-500/30"></div>
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-appgray px-2 text-gray-400">OR</span>
+          </div>
+        </div>
+        
+        <GoogleLoginButton 
+          userType="merchant" 
+          onSuccess={() => navigate('/merchant/dashboard')} 
+        />
+        
+        <div className="text-center text-sm text-gray-400 mt-6">
           Don't have a merchant account?{' '}
           <Link to="/merchant/register" className="text-appgold hover:underline">
             Register now
@@ -100,7 +115,7 @@ const MerchantLogin = () => {
         </div>
         
         <div className="text-center text-sm text-gray-400 mt-2">
-          Are you a customer?{' '}
+          Want to shop on GrocMerchants?{' '}
           <Link to="/login" className="text-appgold hover:underline">
             Login as Customer
           </Link>

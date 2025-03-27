@@ -10,6 +10,8 @@ import CustomerLogin from "./pages/auth/CustomerLogin";
 import CustomerRegister from "./pages/auth/CustomerRegister";
 import MerchantLogin from "./pages/auth/MerchantLogin";
 import MerchantRegister from "./pages/auth/MerchantRegister";
+import AboutUs from "./pages/AboutUs";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,10 @@ const App = () => (
           {/* Merchant Auth Routes */}
           <Route path="/merchant/login" element={<MerchantLogin />} />
           <Route path="/merchant/register" element={<MerchantRegister />} />
+          
+          {/* Content Pages */}
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/terms" element={<Terms />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

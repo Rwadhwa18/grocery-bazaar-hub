@@ -1,10 +1,19 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Bell, Search, Menu, X } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/auth/AuthModal';
 import Logo from './Logo';
+import { 
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle
+} from '@/components/ui/navigation-menu';
 
 const Navbar = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -24,6 +33,40 @@ const Navbar = () => {
     <>
       <header className="w-full bg-appbg sticky top-0 z-50 border-b border-appgray">
         <div className="container mx-auto px-4 py-3">
+          {/* Top nav with pages */}
+          <div className="flex items-center justify-between mb-2">
+            <NavigationMenu className="hidden md:flex">
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <Link to="/about-us">
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      About Us
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/terms">
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      Terms & Conditions
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+            <div className="hidden md:flex ml-auto gap-2">
+              <Link to="/merchant/login">
+                <Button variant="ghost" size="sm" className="text-sm">
+                  Merchant Login
+                </Button>
+              </Link>
+              <Link to="/merchant/register">
+                <Button variant="ghost" size="sm" className="text-sm">
+                  Become a Merchant
+                </Button>
+              </Link>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Logo showTagline={true} />
@@ -44,12 +87,6 @@ const Navbar = () => {
 
             {/* Actions - Desktop */}
             <div className="hidden md:flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell size={24} className="text-appfg" />
-                <span className="absolute -top-1 -right-1 bg-appgold text-xs text-appbg rounded-full h-5 w-5 flex items-center justify-center">
-                  3
-                </span>
-              </Button>
               <Link to="/cart">
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart size={24} className="text-appfg" />
@@ -109,6 +146,8 @@ const Navbar = () => {
               <Link to="/" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Home</Link>
               <Link to="/shop" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Shop</Link>
               <Link to="/categories" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Categories</Link>
+              <Link to="/about-us" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>About Us</Link>
+              <Link to="/terms" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Terms & Conditions</Link>
               <Link to="/profile" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Profile</Link>
               <div className="border-t border-appgray my-4 pt-4">
                 <Link to="/login">

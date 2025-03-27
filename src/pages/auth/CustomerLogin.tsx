@@ -1,0 +1,107 @@
+
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from '@/hooks/use-toast';
+import { Mail, Lock } from 'lucide-react';
+import AuthLayout from './AuthLayout';
+
+const CustomerLogin = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      // Simulate login for now
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Login successful",
+        description: "Welcome back to GrocMerchants!",
+      });
+      
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: "Please check your credentials and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout 
+      title="Customer Login" 
+      subtitle="Welcome back! Log in to continue shopping"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="your@email.com" 
+              className="pl-10"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <Label htmlFor="password">Password</Label>
+            <Link to="/forgot-password" className="text-xs text-appgold hover:underline">
+              Forgot password?
+            </Link>
+          </div>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Input 
+              id="password" 
+              type="password" 
+              placeholder="••••••••" 
+              className="pl-10"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+        
+        <Button type="submit" className="w-full app-button" disabled={isLoading}>
+          {isLoading ? 'Logging in...' : 'Login'}
+        </Button>
+        
+        <div className="text-center text-sm text-gray-400 mt-4">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-appgold hover:underline">
+            Register now
+          </Link>
+        </div>
+        
+        <div className="text-center text-sm text-gray-400 mt-2">
+          Are you a merchant?{' '}
+          <Link to="/merchant/login" className="text-appgold hover:underline">
+            Login as Merchant
+          </Link>
+        </div>
+      </form>
+    </AuthLayout>
+  );
+};
+
+export default CustomerLogin;

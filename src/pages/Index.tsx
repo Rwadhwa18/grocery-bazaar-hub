@@ -162,7 +162,7 @@ const Index = () => {
                     Shop Now <ArrowRight className="ml-2" />
                   </Button>
                 </Link>
-                <Link to="/register">
+                <Link to="/merchant/register">
                   <Button variant="outline" className="border-appgold text-appgold hover:bg-appgold hover:text-appbg py-6 text-lg">
                     Become a Merchant
                   </Button>
@@ -287,19 +287,23 @@ const Index = () => {
                     For Merchants
                   </div>
                   <h2 className="text-2xl md:text-4xl font-bold mb-4">
-                    Grow Your Business with Grocery Bazaar
+                    Grow Your Business with GrocMerchants
                   </h2>
                   <p className="text-gray-300 mb-6 max-w-lg">
                     Join our platform to reach more customers, manage orders efficiently, and grow your grocery business online.
                   </p>
                   <div className="flex flex-wrap gap-4">
-                    <Button className="app-button">
-                      <ShoppingBag className="mr-2" size={18} />
-                      Register as Merchant
-                    </Button>
-                    <Button variant="outline" className="border-appgold text-appgold hover:bg-appgold hover:text-appbg">
-                      Learn More
-                    </Button>
+                    <Link to="/merchant/register">
+                      <Button className="app-button">
+                        <ShoppingBag className="mr-2" size={18} />
+                        Register as Merchant
+                      </Button>
+                    </Link>
+                    <Link to="/merchant/login">
+                      <Button variant="outline" className="border-appgold text-appgold hover:bg-appgold hover:text-appbg">
+                        Merchant Login
+                      </Button>
+                    </Link>
                   </div>
                 </div>
                 <div className="md:w-1/3 mt-8 md:mt-0 md:absolute md:right-0 md:top-0 md:bottom-0">

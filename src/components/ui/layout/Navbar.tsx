@@ -58,13 +58,19 @@ const Navbar = () => {
                   </span>
                 </Button>
               </Link>
-              <Button 
-                variant="outline" 
-                className="border border-appgold text-appgold hover:bg-appgold hover:text-appbg transition-all"
-                onClick={() => handleOpenAuth('login')}
-              >
-                Login
-              </Button>
+              <Link to="/login">
+                <Button 
+                  variant="outline" 
+                  className="border border-appgold text-appgold hover:bg-appgold hover:text-appbg transition-all"
+                >
+                  Login
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button className="app-button">
+                  Register
+                </Button>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -105,29 +111,48 @@ const Navbar = () => {
               <Link to="/categories" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Categories</Link>
               <Link to="/profile" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Profile</Link>
               <div className="border-t border-appgray my-4 pt-4">
-                <Button 
-                  className="w-full app-button mb-3" 
-                  onClick={() => {
-                    handleOpenAuth('login');
-                    toggleMenu();
-                  }}
-                >
-                  Login
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full border-appgold text-appgold" 
-                  onClick={() => {
-                    handleOpenAuth('register');
-                    toggleMenu();
-                  }}
-                >
-                  Register
-                </Button>
+                <Link to="/login">
+                  <Button 
+                    className="w-full app-button mb-3" 
+                    onClick={toggleMenu}
+                  >
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-appgold text-appgold" 
+                    onClick={toggleMenu}
+                  >
+                    Register
+                  </Button>
+                </Link>
+                <div className="mt-4 pt-4 border-t border-appgray">
+                  <p className="text-sm text-gray-400 mb-2">For Merchants:</p>
+                  <Link to="/merchant/login">
+                    <Button 
+                      variant="outline" 
+                      className="w-full mb-2 border-appgold/50 text-appgold/90" 
+                      onClick={toggleMenu}
+                    >
+                      Merchant Login
+                    </Button>
+                  </Link>
+                  <Link to="/merchant/register">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-appgold/50 text-appgold/90" 
+                      onClick={toggleMenu}
+                    >
+                      Become a Merchant
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </nav>
             <div className="mt-auto p-4 text-center text-sm text-gray-400">
-              <p>© 2023 Grocery Bazaar</p>
+              <p>© {new Date().getFullYear()} GrocMerchants</p>
               <p>All rights reserved</p>
             </div>
           </div>

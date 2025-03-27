@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Navbar } from '@/components/ui/layout/Navbar';
-import { Footer } from '@/components/ui/layout/Footer';
+import Navbar from '@/components/ui/layout/Navbar';
+import Footer from '@/components/ui/layout/Footer';
 
 const AboutUs = () => {
   return (

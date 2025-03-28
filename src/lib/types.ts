@@ -45,3 +45,35 @@ export interface Category {
   name: string;
   icon?: string;
 }
+
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  customerId: string;
+  items: OrderItem[];
+  total: number;
+  status: OrderStatus;
+  createdAt: string;
+  updatedAt: string;
+  estimatedDelivery?: string;
+  trackingNumber?: string;
+  paymentMethod?: string;
+  shippingAddress: Location;
+}
+
+export interface OrderTrackingEvent {
+  id: string;
+  orderId: string;
+  status: OrderStatus;
+  location?: string;
+  timestamp: string;
+  description: string;
+}

@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { Product } from '@/lib/types';
 import { ShoppingCart, Plus, Minus, Package } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/context/CartContext';
 
 interface ProductCardProps {
   product: Product;
@@ -11,14 +11,10 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const [quantity, setQuantity] = useState(1);
-  const { toast } = useToast();
+  const { addToCart } = useCart();
 
   const handleAddToCart = () => {
-    toast({
-      title: "Added to cart",
-      description: `${quantity} × ${product.name} added to your cart`,
-      duration: 3000,
-    });
+    addToCart(product, quantity);
   };
 
   const incrementQuantity = () => setQuantity(prev => prev + 1);

@@ -16,6 +16,11 @@ import Products from "./pages/Products";
 import CategorySelect from "./pages/merchant/CategorySelect";
 import MerchantSetup from "./pages/merchant/MerchantSetup";
 import MerchantDashboardPage from "./pages/merchant/MerchantDashboard";
+import CustomerDashboard from "./pages/customer/CustomerDashboard";
+import Cart from "./pages/customer/Cart";
+import Orders from "./pages/customer/Orders";
+import OrderTracking from "./pages/customer/OrderTracking";
+import Shop from "./pages/Shop";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +37,12 @@ const App = () => (
           <Route path="/login" element={<CustomerLogin />} />
           <Route path="/register" element={<CustomerRegister />} />
           
+          {/* Customer Dashboard Routes */}
+          <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+          <Route path="/customer/cart" element={<Cart />} />
+          <Route path="/customer/orders" element={<Orders />} />
+          <Route path="/customer/order/:id" element={<OrderTracking />} />
+          
           {/* Merchant Auth Routes */}
           <Route path="/merchant/login" element={<MerchantLogin />} />
           <Route path="/merchant/register" element={<MerchantRegister />} />
@@ -41,6 +52,7 @@ const App = () => (
           
           {/* Content Pages */}
           <Route path="/products" element={<Products />} />
+          <Route path="/shop" element={<Shop />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/terms" element={<Terms />} />
           

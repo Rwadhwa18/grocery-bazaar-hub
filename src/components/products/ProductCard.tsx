@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Product } from '@/lib/types';
-import { ShoppingCart, Plus, Minus, Info } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Package } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 
@@ -32,12 +32,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
       )}
       
-      <div className="p-3 rounded-t-lg bg-appgray relative overflow-hidden h-44">
-        <img
-          src={product.imageUrl}
-          alt={product.name}
-          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-        />
+      <div className="p-3 rounded-t-lg bg-appgray relative overflow-hidden h-44 flex items-center justify-center">
+        {product.imageUrl ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <Package size={64} className="text-gray-600" />
+        )}
       </div>
       
       <div className="p-4">
@@ -77,7 +81,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
         
         <Button onClick={handleAddToCart} className="w-full app-button group-hover:bg-opacity-100">
-          <ShoppingCart size={18} />
+          <ShoppingCart size={18} className="mr-2" />
           Add to Cart
         </Button>
       </div>

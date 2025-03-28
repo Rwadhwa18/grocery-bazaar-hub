@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { X, Plus, Upload, Store, MapPin, DollarSign, Phone, Mail, Clock } from 'lucide-react';
+import { X, Plus, Upload, Store, MapPin, DollarSign, Phone, Mail, Clock, Tags, FileImage } from 'lucide-react';
 import Navbar from '@/components/ui/layout/Navbar';
 import Footer from '@/components/ui/layout/Footer';
 
@@ -32,6 +32,16 @@ const MerchantSetup = () => {
   const [storeImages, setStoreImages] = useState<string[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [storeCategory, setStoreCategory] = useState<string>('');
+  const [productImage, setProductImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get the selected category from localStorage
+    const category = localStorage.getItem('merchantCategory');
+    if (category) {
+      setStoreCategory(category);
+    }
+  }, []);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -74,6 +84,21 @@ const MerchantSetup = () => {
 
   const removeStoreImage = (index: number) => {
     setStoreImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleProductImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProductImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeProductImage = () => {
+    setProductImage(null);
   };
 
   const nextStep = () => {
@@ -121,12 +146,27 @@ const MerchantSetup = () => {
     }
   };
 
+  // Get the display name for the category
+  const getCategoryDisplayName = () => {
+    switch(storeCategory) {
+      case 'grocery': return 'Grocery Store';
+      case 'restaurant': return 'Restaurant';
+      case 'clothing': return 'Clothing Store';
+      case 'pharmacy': return 'Pharmacy';
+      case 'fruits': return 'Fruits & Vegetables';
+      case 'supermarket': return 'Supermarket';
+      case 'cafe': return 'Cafe';
+      case 'other': return 'Other';
+      default: return 'Store';
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">Set Up Your Store</h1>
+          <h1 className="text-2xl font-bold mb-6">Set Up Your {getCategoryDisplayName()}</h1>
           
           <div className="flex justify-between mb-6">
             <div className={`flex-1 border-b-2 ${currentStep >= 1 ? 'border-appgold' : 'border-gray-700'} pb-2`}>
@@ -395,7 +435,6 @@ const MerchantSetup = () => {
                   Start adding products to your store. You can add more products later from your merchant dashboard.
                 </p>
                 
-                {/* Product Add Form - This will use the existing Add Product form from MerchantDashboard */}
                 <div className="border border-gray-700 p-4 rounded-lg mb-6">
                   <h3 className="font-semibold mb-3 flex items-center">
                     <Plus size={18} className="mr-2 text-appgold" /> 
@@ -433,34 +472,6 @@ const MerchantSetup = () => {
                           <Input id="product-original-price" type="number" min="0" step="0.01" />
                         </div>
                       </div>
-                    </div>
-                    
-                    {/* Right Column */}
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <FormLabel htmlFor="product-image">Product Image</FormLabel>
-                        <div className="border-2 border-dashed border-gray-700 rounded-lg p-4 text-center">
-                          <div className="py-4">
-                            <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-                            <div className="text-sm text-gray-400 mb-2">
-                              Click to upload product image
-                            </div>
-                            <Input
-                              id="product-image"
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => document.getElementById('product-image')?.click()}
-                            >
-                              Upload Image
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
                       
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -471,6 +482,63 @@ const MerchantSetup = () => {
                         <div className="space-y-2">
                           <FormLabel htmlFor="product-unit">Unit</FormLabel>
                           <Input id="product-unit" type="text" placeholder="e.g. g, kg, ml" />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <FormLabel htmlFor="product-category">Category</FormLabel>
+                        <div className="relative">
+                          <Tags className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                          <Input id="product-category" placeholder="e.g. Fruits, Beverages" className="pl-10" />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Right Column */}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <FormLabel htmlFor="product-image">Product Image</FormLabel>
+                        <div className="border-2 border-dashed border-gray-700 rounded-lg p-4 text-center">
+                          {productImage ? (
+                            <div className="py-2 relative">
+                              <img 
+                                src={productImage} 
+                                alt="Product preview" 
+                                className="mx-auto h-40 object-contain mb-2" 
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={removeProductImage}
+                                className="text-xs"
+                              >
+                                <X size={14} className="mr-1" /> Remove
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="py-4">
+                              <FileImage className="mx-auto h-12 w-12 text-gray-400 mb-2" />
+                              <div className="text-sm text-gray-400 mb-2">
+                                Upload a product image
+                              </div>
+                              <Input
+                                id="product-image"
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleProductImageUpload}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => document.getElementById('product-image')?.click()}
+                              >
+                                <Upload size={16} className="mr-2" />
+                                Upload Image
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

@@ -30,11 +30,11 @@ const MerchantRegister = () => {
       
       toast({
         title: "Registration successful",
-        description: "You can now set up your store",
+        description: "Please select your store category",
       });
       
-      // Redirect to merchant setup page instead of login
-      navigate('/merchant/setup');
+      // Redirect to store category selection page
+      navigate('/merchant/category-select');
     } catch (error) {
       toast({
         title: "Registration failed",

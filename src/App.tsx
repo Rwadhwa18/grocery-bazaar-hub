@@ -13,6 +13,7 @@ import MerchantRegister from "./pages/auth/MerchantRegister";
 import AboutUs from "./pages/AboutUs";
 import Terms from "./pages/Terms";
 import Products from "./pages/Products";
+import CategorySelect from "./pages/merchant/CategorySelect";
 import MerchantSetup from "./pages/merchant/MerchantSetup";
 import MerchantDashboard from "./components/merchants/MerchantDashboard";
 
@@ -34,6 +35,7 @@ const App = () => (
           {/* Merchant Auth Routes */}
           <Route path="/merchant/login" element={<MerchantLogin />} />
           <Route path="/merchant/register" element={<MerchantRegister />} />
+          <Route path="/merchant/category-select" element={<CategorySelect />} />
           <Route path="/merchant/setup" element={<MerchantSetup />} />
           <Route path="/merchant/dashboard" element={<MerchantDashboard />} />
           

@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,13 +16,17 @@ import {
   Clock, 
   FileImage, 
   Tags,
-  MapPin
+  MapPin,
+  ArrowLeft,
+  Store
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 const MerchantDashboard = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [shopImagePreview, setShopImagePreview] = useState<string | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -29,6 +34,17 @@ const MerchantDashboard = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleShopImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setShopImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -47,9 +63,112 @@ const MerchantDashboard = () => {
     setImagePreview(null);
   };
 
+  const handleUpdateShopImage = () => {
+    toast({
+      title: "Shop Image Updated",
+      description: "Your shop image has been successfully updated",
+      duration: 3000,
+    });
+  };
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   return (
     <div className="w-full animate-fade-in">
-      <h1 className="text-2xl font-bold mb-6">Merchant Dashboard</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Merchant Dashboard</h1>
+        <Button 
+          variant="outline" 
+          onClick={handleGoBack} 
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft size={16} />
+          Back
+        </Button>
+      </div>
+
+      {/* Shop Image Card */}
+      <Card className="bg-appgray border-appgray mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Store size={20} className="text-appgold" />
+            Shop Profile
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="w-full md:w-1/3">
+              <div className="border-2 border-dashed border-gray-700 rounded-lg p-4 text-center h-60">
+                {shopImagePreview ? (
+                  <div className="relative h-full">
+                    <img 
+                      src={shopImagePreview} 
+                      alt="Shop preview" 
+                      className="mx-auto h-full object-cover rounded-md" 
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-2 absolute bottom-0 left-1/2 transform -translate-x-1/2"
+                      onClick={() => setShopImagePreview(null)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <Store className="h-12 w-12 text-gray-400 mb-2" />
+                    <div className="text-sm text-gray-400 mb-2">
+                      Upload your shop image
+                    </div>
+                    <Input
+                      id="shop-image"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleShopImageChange}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById('shop-image')?.click()}
+                    >
+                      <FileImage size={16} className="mr-2" />
+                      Browse
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="w-full md:w-2/3">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="shop-name">Shop Name</Label>
+                  <Input id="shop-name" placeholder="e.g. Nature's Best Groceries" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="shop-description">Shop Description</Label>
+                  <Textarea 
+                    id="shop-description" 
+                    placeholder="Brief description about your shop"
+                    className="resize-none min-h-[100px]" 
+                  />
+                </div>
+                <Button 
+                  onClick={handleUpdateShopImage} 
+                  className="app-button"
+                  disabled={!shopImagePreview}
+                >
+                  Update Shop Profile
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Card className="bg-appgray border-appgray">

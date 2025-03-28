@@ -15,7 +15,7 @@ import Terms from "./pages/Terms";
 import Products from "./pages/Products";
 import CategorySelect from "./pages/merchant/CategorySelect";
 import MerchantSetup from "./pages/merchant/MerchantSetup";
-import MerchantDashboard from "./components/merchants/MerchantDashboard";
+import MerchantDashboardPage from "./pages/merchant/MerchantDashboard";
 
 const queryClient = new QueryClient();
 
@@ -37,7 +37,7 @@ const App = () => (
           <Route path="/merchant/register" element={<MerchantRegister />} />
           <Route path="/merchant/category-select" element={<CategorySelect />} />
           <Route path="/merchant/setup" element={<MerchantSetup />} />
-          <Route path="/merchant/dashboard" element={<MerchantDashboard />} />
+          <Route path="/merchant/dashboard" element={<MerchantDashboardPage />} />
           
           {/* Content Pages */}
           <Route path="/products" element={<Products />} />

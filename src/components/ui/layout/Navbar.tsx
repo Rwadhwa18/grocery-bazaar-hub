@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart, Search, Menu, X } from 'lucide-react';
@@ -38,6 +37,13 @@ const Navbar = () => {
             <NavigationMenu className="hidden md:flex">
               <NavigationMenuList>
                 <NavigationMenuItem>
+                  <Link to="/products">
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      Products
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
                   <Link to="/about-us">
                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                       About Us
@@ -68,10 +74,8 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            {/* Logo */}
             <Logo showTagline={true} />
 
-            {/* Search Bar - Desktop */}
             <div className={`hidden md:flex items-center flex-1 mx-8 relative ${isSearchFocused ? 'ring-2 ring-appgold' : ''}`}>
               <div className="relative w-full">
                 <input
@@ -85,7 +89,6 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Actions - Desktop */}
             <div className="hidden md:flex items-center gap-4">
               <Link to="/cart">
                 <Button variant="ghost" size="icon" className="relative">
@@ -110,7 +113,6 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center">
               <Link to="/cart" className="mr-4 relative">
                 <ShoppingCart size={24} className="text-appfg" />
@@ -123,8 +125,7 @@ const Navbar = () => {
               </Button>
             </div>
           </div>
-          
-          {/* Mobile Search */}
+
           <div className="mt-3 md:hidden">
             <div className="relative w-full">
               <input
@@ -138,12 +139,12 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden fixed inset-0 z-40 bg-appbg animate-fade-in">
           <div className="pt-20 p-4 flex flex-col h-full">
             <nav className="flex flex-col gap-4 text-lg">
               <Link to="/" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Home</Link>
+              <Link to="/products" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Products</Link>
               <Link to="/shop" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Shop</Link>
               <Link to="/categories" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Categories</Link>
               <Link to="/about-us" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>About Us</Link>
@@ -198,7 +199,6 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Auth Modal */}
       <AuthModal 
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)} 

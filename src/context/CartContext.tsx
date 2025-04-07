@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import * as React from 'react';
 import { Product, CartItem } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,14 +13,14 @@ interface CartContextType {
   itemCount: number;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+const CartContext = React.createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = React.useState<CartItem[]>([]);
   const { toast } = useToast();
   
   // Load cart from localStorage on initial render
-  useEffect(() => {
+  React.useEffect(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       try {
@@ -32,7 +32,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
   
   // Save cart to localStorage whenever it changes
-  useEffect(() => {
+  React.useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
   
@@ -117,7 +117,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const useCart = () => {
-  const context = useContext(CartContext);
+  const context = React.useContext(CartContext);
   if (context === undefined) {
     throw new Error('useCart must be used within a CartProvider');
   }

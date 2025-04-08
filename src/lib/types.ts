@@ -1,4 +1,3 @@
-
 export type UserRole = 'customer' | 'merchant';
 
 export interface User {
@@ -21,22 +20,41 @@ export interface Location {
   };
 }
 
+export interface ProductVariant {
+  id: string;
+  barcode: string;
+  rating: number;
+  weightValue: number;
+  weightUnit: string; // g, kg, ml, L, pcs
+  price: number;
+  mrp: number; // Maximum Retail Price (equivalent to originalPrice)
+  stock: number;
+}
+
 export interface Product {
   id: string;
   name: string;
   description: string;
+  brand?: string;
+  isVeg?: boolean;
+  categories?: string[];
+  imageUrls?: string[];
+  imageUrl: string; // Keeping for backward compatibility
+  category: string;
+  merchantId: string;
+  variants: ProductVariant[];
+  
+  // Legacy fields (keeping for backward compatibility)
   price: number;
   originalPrice?: number;
   discountPercentage?: number;
-  imageUrl: string;
-  category: string;
   unit: string;
   quantity: string | number;
-  merchantId: string;
 }
 
 export interface CartItem {
   product: Product;
+  variant?: ProductVariant;
   quantity: number;
 }
 
@@ -53,6 +71,7 @@ export interface OrderItem {
   productName: string;
   quantity: number;
   price: number;
+  variantId?: string;
 }
 
 export interface Order {

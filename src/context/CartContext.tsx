@@ -1,13 +1,13 @@
 
 import * as React from 'react';
-import { Product, CartItem } from '@/lib/types';
+import { Product, CartItem, ProductVariant } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, quantity: number) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: Product, quantity: number, variant?: ProductVariant) => void;
+  removeFromCart: (productId: string, variantId?: string) => void;
+  updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
   total: number;
   itemCount: number;
@@ -36,29 +36,47 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
   
-  const addToCart = (product: Product, quantity: number) => {
+  const addToCart = (product: Product, quantity: number, variant?: ProductVariant) => {
     setItems(prevItems => {
-      const existingItem = prevItems.find(item => item.product.id === product.id);
+      const cartItemId = variant 
+        ? `${product.id}-${variant.id}`
+        : product.id;
+        
+      const existingItemIndex = prevItems.findIndex(item => {
+        if (variant && item.variant) {
+          return item.product.id === product.id && item.variant.id === variant.id;
+        }
+        return item.product.id === product.id && !item.variant;
+      });
       
-      if (existingItem) {
-        return prevItems.map(item => 
-          item.product.id === product.id 
+      if (existingItemIndex !== -1) {
+        // Item exists, update quantity
+        return prevItems.map((item, index) => 
+          index === existingItemIndex 
             ? { ...item, quantity: item.quantity + quantity } 
             : item
         );
       } else {
-        return [...prevItems, { product, quantity }];
+        // Item doesn't exist, add new item
+        return [...prevItems, { product, variant, quantity }];
       }
     });
     
+    const variantText = variant ? `(${variant.weightValue}${variant.weightUnit})` : '';
+    
     toast({
       title: "Added to cart",
-      description: `${quantity} × ${product.name} added to your cart`,
+      description: `${quantity} × ${product.name} ${variantText} added to your cart`,
     });
   };
   
-  const removeFromCart = (productId: string) => {
-    setItems(prevItems => prevItems.filter(item => item.product.id !== productId));
+  const removeFromCart = (productId: string, variantId?: string) => {
+    setItems(prevItems => prevItems.filter(item => {
+      if (variantId && item.variant) {
+        return !(item.product.id === productId && item.variant.id === variantId);
+      }
+      return item.product.id !== productId;
+    }));
     
     toast({
       title: "Removed from cart",
@@ -66,18 +84,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
   
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number, variantId?: string) => {
     if (quantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(productId, variantId);
       return;
     }
     
     setItems(prevItems => 
-      prevItems.map(item => 
-        item.product.id === productId 
-          ? { ...item, quantity } 
-          : item
-      )
+      prevItems.map(item => {
+        const isMatch = variantId && item.variant
+          ? item.product.id === productId && item.variant.id === variantId
+          : item.product.id === productId && !item.variant;
+          
+        return isMatch ? { ...item, quantity } : item;
+      })
     );
   };
   
@@ -90,7 +110,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
   
   const total = items.reduce(
-    (sum, item) => sum + (item.product.price * item.quantity), 
+    (sum, item) => {
+      const price = item.variant ? item.variant.price : item.product.price;
+      return sum + (price * item.quantity);
+    }, 
     0
   );
   

@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Search, Menu, X } from 'lucide-react';
+
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ShoppingCart, Search, Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/auth/AuthModal';
 import Logo from './Logo';
+import { useCart } from '@/context/CartContext';
 import { 
   NavigationMenu,
   NavigationMenuContent,
@@ -19,13 +21,59 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authType, setAuthType] = useState<'login' | 'register'>('login');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState<'customer' | 'merchant' | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { itemCount } = useCart();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   
   const handleOpenAuth = (type: 'login' | 'register') => {
     setAuthType(type);
     setShowAuthModal(true);
+  };
+
+  // Check login status when component mounts and when location changes
+  useEffect(() => {
+    // In a real app, this would be an actual auth check with tokens/cookies
+    // For now we'll simulate login status based on URL path
+    const customerPages = ['/customer/dashboard', '/customer/orders', '/customer/order'];
+    const merchantPages = ['/merchant/dashboard', '/merchant/inventory', '/merchant/setup'];
+    
+    const isCustomerPath = customerPages.some(page => location.pathname.includes(page));
+    const isMerchantPath = merchantPages.some(page => location.pathname.includes(page));
+    
+    if (isCustomerPath) {
+      setIsLoggedIn(true);
+      setUserType('customer');
+    } else if (isMerchantPath) {
+      setIsLoggedIn(true);
+      setUserType('merchant');
+    } else {
+      // Check localStorage for login status as fallback
+      const storedUserType = localStorage.getItem('userType');
+      if (storedUserType === 'customer' || storedUserType === 'merchant') {
+        setIsLoggedIn(true);
+        setUserType(storedUserType as 'customer' | 'merchant');
+      }
+    }
+  }, [location]);
+
+  const handleLogout = () => {
+    // In a real app, this would clear tokens/cookies
+    localStorage.removeItem('userType');
+    setIsLoggedIn(false);
+    setUserType(null);
+    navigate('/');
+  };
+
+  const goToDashboard = () => {
+    if (userType === 'customer') {
+      navigate('/customer/dashboard');
+    } else if (userType === 'merchant') {
+      navigate('/merchant/dashboard');
+    }
   };
 
   return (
@@ -60,16 +108,25 @@ const Navbar = () => {
               </NavigationMenuList>
             </NavigationMenu>
             <div className="hidden md:flex ml-auto gap-2">
-              <Link to="/merchant/login">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  Merchant Login
+              {!isLoggedIn && (
+                <>
+                  <Link to="/merchant/login">
+                    <Button variant="ghost" size="sm" className="text-sm">
+                      Merchant Login
+                    </Button>
+                  </Link>
+                  <Link to="/merchant/register">
+                    <Button variant="ghost" size="sm" className="text-sm">
+                      Become a Merchant
+                    </Button>
+                  </Link>
+                </>
+              )}
+              {isLoggedIn && userType === 'merchant' && (
+                <Button variant="ghost" size="sm" className="text-sm" onClick={goToDashboard}>
+                  Merchant Dashboard
                 </Button>
-              </Link>
-              <Link to="/merchant/register">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  Become a Merchant
-                </Button>
-              </Link>
+              )}
             </div>
           </div>
 
@@ -93,32 +150,59 @@ const Navbar = () => {
               <Link to="/cart">
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart size={24} className="text-appfg" />
-                  <span className="absolute -top-1 -right-1 bg-appgold text-xs text-appbg rounded-full h-5 w-5 flex items-center justify-center">
-                    2
-                  </span>
+                  {itemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-appgold text-xs text-appbg rounded-full h-5 w-5 flex items-center justify-center">
+                      {itemCount}
+                    </span>
+                  )}
                 </Button>
               </Link>
-              <Link to="/login">
-                <Button 
-                  variant="outline" 
-                  className="border border-appgold text-appgold hover:bg-appgold hover:text-appbg transition-all"
-                >
-                  Login
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button className="app-button">
-                  Register
-                </Button>
-              </Link>
+              
+              {!isLoggedIn ? (
+                <>
+                  <Link to="/login">
+                    <Button 
+                      variant="outline" 
+                      className="border border-appgold text-appgold hover:bg-appgold hover:text-appbg transition-all"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/register">
+                    <Button className="app-button">
+                      Register
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="outline" 
+                    className="border border-appgold text-appgold hover:bg-appgold hover:text-appbg transition-all"
+                    onClick={goToDashboard}
+                  >
+                    <User size={18} className="mr-2" />
+                    Dashboard
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="border border-gray-500 text-gray-300"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Button>
+                </>
+              )}
             </div>
 
             <div className="md:hidden flex items-center">
               <Link to="/cart" className="mr-4 relative">
                 <ShoppingCart size={24} className="text-appfg" />
-                <span className="absolute -top-1 -right-1 bg-appgold text-xs text-appbg rounded-full h-5 w-5 flex items-center justify-center">
-                  2
-                </span>
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-appgold text-xs text-appbg rounded-full h-5 w-5 flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                )}
               </Link>
               <Button variant="ghost" size="icon" onClick={toggleMenu}>
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -149,46 +233,84 @@ const Navbar = () => {
               <Link to="/categories" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Categories</Link>
               <Link to="/about-us" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>About Us</Link>
               <Link to="/terms" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Terms & Conditions</Link>
-              <Link to="/profile" className="p-3 hover:bg-appgray rounded-md" onClick={toggleMenu}>Profile</Link>
+              
+              {isLoggedIn && (
+                <Link to={userType === 'customer' ? '/customer/dashboard' : '/merchant/dashboard'} 
+                  className="p-3 hover:bg-appgray rounded-md" 
+                  onClick={toggleMenu}
+                >
+                  Dashboard
+                </Link>
+              )}
+              
               <div className="border-t border-appgray my-4 pt-4">
-                <Link to="/login">
-                  <Button 
-                    className="w-full app-button mb-3" 
-                    onClick={toggleMenu}
-                  >
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/register">
-                  <Button 
-                    variant="outline" 
-                    className="w-full border-appgold text-appgold" 
-                    onClick={toggleMenu}
-                  >
-                    Register
-                  </Button>
-                </Link>
-                <div className="mt-4 pt-4 border-t border-appgray">
-                  <p className="text-sm text-gray-400 mb-2">For Merchants:</p>
-                  <Link to="/merchant/login">
+                {!isLoggedIn ? (
+                  <>
+                    <Link to="/login">
+                      <Button 
+                        className="w-full app-button mb-3" 
+                        onClick={toggleMenu}
+                      >
+                        Login
+                      </Button>
+                    </Link>
+                    <Link to="/register">
+                      <Button 
+                        variant="outline" 
+                        className="w-full border-appgold text-appgold" 
+                        onClick={toggleMenu}
+                      >
+                        Register
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      className="w-full app-button mb-3" 
+                      onClick={() => {
+                        goToDashboard();
+                        toggleMenu();
+                      }}
+                    >
+                      Dashboard
+                    </Button>
                     <Button 
                       variant="outline" 
-                      className="w-full mb-2 border-appgold/50 text-appgold/90" 
-                      onClick={toggleMenu}
+                      className="w-full border-gray-500 text-gray-300" 
+                      onClick={() => {
+                        handleLogout();
+                        toggleMenu();
+                      }}
                     >
-                      Merchant Login
+                      Logout
                     </Button>
-                  </Link>
-                  <Link to="/merchant/register">
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-appgold/50 text-appgold/90" 
-                      onClick={toggleMenu}
-                    >
-                      Become a Merchant
-                    </Button>
-                  </Link>
-                </div>
+                  </>
+                )}
+                
+                {!isLoggedIn && (
+                  <div className="mt-4 pt-4 border-t border-appgray">
+                    <p className="text-sm text-gray-400 mb-2">For Merchants:</p>
+                    <Link to="/merchant/login">
+                      <Button 
+                        variant="outline" 
+                        className="w-full mb-2 border-appgold/50 text-appgold/90" 
+                        onClick={toggleMenu}
+                      >
+                        Merchant Login
+                      </Button>
+                    </Link>
+                    <Link to="/merchant/register">
+                      <Button 
+                        variant="outline" 
+                        className="w-full border-appgold/50 text-appgold/90" 
+                        onClick={toggleMenu}
+                      >
+                        Become a Merchant
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </div>
             </nav>
             <div className="mt-auto p-4 text-center text-sm text-gray-400">

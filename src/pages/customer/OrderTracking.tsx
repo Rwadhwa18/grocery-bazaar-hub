@@ -1,15 +1,15 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/ui/layout/Navbar';
 import Footer from '@/components/ui/layout/Footer';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Package, CheckCircle, Clock, Truck, Home, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Package, CheckCircle, Clock, Truck, Home, AlertTriangle, Share2, MapPin } from 'lucide-react';
 import { Order, OrderTrackingEvent, OrderStatus } from '@/lib/types';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import LocationSharing from '@/components/customer/LocationSharing';
+import LiveOrderTracking from '@/components/customer/LiveOrderTracking';
 
-// Mock order data
 const mockOrder: Order = {
   id: 'ORD123456',
   customerId: 'cust1',
@@ -32,7 +32,6 @@ const mockOrder: Order = {
   }
 };
 
-// Mock tracking events
 const mockTrackingEvents: OrderTrackingEvent[] = [
   {
     id: 'evt1',
@@ -83,16 +82,14 @@ const OrderTracking = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [trackingEvents, setTrackingEvents] = useState<OrderTrackingEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showLocationSharing, setShowLocationSharing] = useState(false);
   
   useEffect(() => {
-    // Simulate fetching order and tracking data
     const fetchOrderDetails = async () => {
       setIsLoading(true);
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       if (id) {
-        // In a real app, would fetch real data for the specific order ID
         setOrder({...mockOrder, id});
         setTrackingEvents(mockTrackingEvents.map(event => ({...event, orderId: id})));
       }
@@ -123,7 +120,6 @@ const OrderTracking = () => {
       description: `Order ${id} has been cancelled successfully`,
     });
     
-    // Update local state
     if (order) {
       setOrder({...order, status: 'cancelled'});
       setTrackingEvents([
@@ -137,6 +133,32 @@ const OrderTracking = () => {
           description: 'Order cancelled by customer'
         }
       ]);
+    }
+  };
+
+  const handleLocationShare = (coords: GeolocationCoordinates) => {
+    console.log('Location shared:', coords);
+    toast({
+      title: "Location shared with delivery partner",
+      description: "Your current location has been shared to help with delivery"
+    });
+  };
+  
+  const handleShareOrder = () => {
+    if (navigator.share && order) {
+      navigator.share({
+        title: `Order #${order.id}`,
+        text: `Track my order #${order.id} from Grocery Bazaar Hub`,
+        url: window.location.href
+      })
+      .then(() => console.log('Order shared successfully'))
+      .catch((error) => console.log('Error sharing order:', error));
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied to clipboard",
+        description: "Share this link with others to let them track your order"
+      });
     }
   };
 
@@ -155,10 +177,25 @@ const OrderTracking = () => {
             Back to Orders
           </Button>
           
-          <h1 className="text-3xl font-bold mb-2">Order Tracking</h1>
-          <p className="text-gray-400">
-            {isLoading ? 'Loading order details...' : order ? `Track your order ${order.id}` : 'Order not found'}
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Order Tracking</h1>
+              <p className="text-gray-400">
+                {isLoading ? 'Loading order details...' : order ? `Track your order ${order.id}` : 'Order not found'}
+              </p>
+            </div>
+            
+            {order && !isLoading && (
+              <Button
+                variant="outline"
+                className="border-appgold text-appgold"
+                onClick={handleShareOrder}
+              >
+                <Share2 size={16} className="mr-2" />
+                Share Order
+              </Button>
+            )}
+          </div>
         </div>
         
         {isLoading ? (
@@ -167,7 +204,36 @@ const OrderTracking = () => {
           </div>
         ) : order ? (
           <div className="space-y-8">
-            {/* Order Status Card */}
+            {order.status === 'shipped' && (
+              <LiveOrderTracking order={order} />
+            )}
+            
+            {(order.status === 'shipped' || order.status === 'processing') && (
+              <>
+                {showLocationSharing ? (
+                  <LocationSharing onLocationShare={handleLocationShare} />
+                ) : (
+                  <div className="app-card p-4 mb-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold">Share Your Location</h3>
+                        <p className="text-sm text-gray-400">
+                          Share your location to help delivery personnel find you easier
+                        </p>
+                      </div>
+                      <Button
+                        className="app-button"
+                        onClick={() => setShowLocationSharing(true)}
+                      >
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Enable
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
             <div className="app-card p-6">
               <div className="flex flex-col md:flex-row justify-between">
                 <div>
@@ -191,7 +257,6 @@ const OrderTracking = () => {
                 )}
               </div>
               
-              {/* Progress bar */}
               <div className="mt-8 mb-4">
                 <div className="relative">
                   <div className="h-2 bg-appgray rounded-full">
@@ -253,7 +318,6 @@ const OrderTracking = () => {
                 </div>
               )}
               
-              {/* Tracking Information */}
               {order.trackingNumber && (
                 <div className="mt-6 p-4 border border-appgray rounded-lg">
                   <div className="flex flex-col md:flex-row justify-between">
@@ -274,7 +338,6 @@ const OrderTracking = () => {
               )}
             </div>
             
-            {/* Tracking Timeline */}
             <div className="app-card p-6">
               <h2 className="text-xl font-semibold mb-6">Tracking Timeline</h2>
               
@@ -310,7 +373,6 @@ const OrderTracking = () => {
               </div>
             </div>
             
-            {/* Order Items */}
             <div className="app-card p-6">
               <h2 className="text-xl font-semibold mb-6">Order Items</h2>
               
@@ -349,7 +411,6 @@ const OrderTracking = () => {
               </div>
             </div>
             
-            {/* Shipping Address */}
             <div className="app-card p-6">
               <h2 className="text-xl font-semibold mb-4">Shipping Address</h2>
               

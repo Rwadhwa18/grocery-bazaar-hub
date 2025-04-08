@@ -1,16 +1,14 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/ui/layout/Navbar';
 import Footer from '@/components/ui/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Package, Clock, CheckCircle, XCircle, ShoppingBag, Search } from 'lucide-react';
+import { ArrowLeft, Package, Clock, CheckCircle, XCircle, ShoppingBag, Search, Archive } from 'lucide-react';
 import { Order, OrderStatus } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
 
-// Mock orders data
 const mockOrders: Order[] = [
   {
     id: 'ORD123456',
@@ -145,12 +143,11 @@ const Orders = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showPastOrders, setShowPastOrders] = useState(false);
   
   useEffect(() => {
-    // Simulate fetching orders from an API
     const fetchOrders = async () => {
       setIsLoading(true);
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       setOrders(mockOrders);
       setIsLoading(false);
@@ -159,14 +156,34 @@ const Orders = () => {
     fetchOrders();
   }, []);
   
-  const filteredOrders = orders.filter(order => {
+  const sortedOrders = [...orders].sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  
+  const currentOrders = sortedOrders.filter(order => 
+    order.status !== 'delivered' && order.status !== 'cancelled'
+  );
+  
+  const pastOrders = sortedOrders.filter(order => 
+    order.status === 'delivered' || order.status === 'cancelled'
+  );
+  
+  const filteredOrders = activeTab === 'all' 
+    ? (showPastOrders ? [...currentOrders, ...pastOrders] : currentOrders)
+    : (showPastOrders 
+        ? [...currentOrders.filter(order => order.status === activeTab), 
+           ...pastOrders.filter(order => order.status === activeTab)]
+        : currentOrders.filter(order => order.status === activeTab)
+      );
+  
+  const searchFilteredOrders = filteredOrders.filter(order => {
     const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          order.items.some(item => item.productName.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesTab = activeTab === 'all' || order.status === activeTab;
-    
-    return matchesSearch && matchesTab;
+    return matchesSearch;
   });
+  
+  const hasCurrentOrders = currentOrders.length > 0;
+  const hasPastOrders = pastOrders.length > 0;
 
   return (
     <div className="min-h-screen flex flex-col bg-appbg">
@@ -200,14 +217,25 @@ const Orders = () => {
               />
             </div>
             
-            <Button 
-              variant="outline" 
-              className="border-appgold text-appgold hover:bg-appgold/10 sm:self-end"
-              onClick={() => navigate('/shop')}
-            >
-              <ShoppingBag size={18} className="mr-2" />
-              Browse Products
-            </Button>
+            <div className="flex gap-4">
+              <Button 
+                variant="outline" 
+                className={`${showPastOrders ? 'border-appgold text-appgold' : 'border-appgray text-gray-400'}`}
+                onClick={() => setShowPastOrders(!showPastOrders)}
+              >
+                <Archive size={18} className="mr-2" />
+                {showPastOrders ? 'Hide Past Orders' : 'Show Past Orders'}
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="border-appgold text-appgold hover:bg-appgold/10 sm:self-end"
+                onClick={() => navigate('/shop')}
+              >
+                <ShoppingBag size={18} className="mr-2" />
+                Browse Products
+              </Button>
+            </div>
           </div>
           
           <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
@@ -225,53 +253,117 @@ const Orders = () => {
                 <div className="py-12 text-center">
                   <p className="text-gray-400">Loading orders...</p>
                 </div>
-              ) : filteredOrders.length > 0 ? (
+              ) : searchFilteredOrders.length > 0 ? (
                 <div className="space-y-4">
-                  {filteredOrders.map((order) => (
-                    <div 
-                      key={order.id} 
-                      className="app-card p-4 border border-appgray hover:border-appgold transition-colors cursor-pointer"
-                      onClick={() => navigate(`/customer/order/${order.id}`)}
-                    >
-                      <div className="flex flex-col md:flex-row justify-between mb-4">
-                        <div>
-                          <div className="flex items-center">
-                            <h3 className="font-semibold mr-3">{order.id}</h3>
-                            <span className={`px-2 py-0.5 text-xs rounded-full border ${getStatusColor(order.status)}`}>
-                              {statusIcons[order.status]}
-                              <span className="ml-1">{statusLabels[order.status]}</span>
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-400">
-                            Ordered on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
-                          </p>
-                        </div>
-                        <div className="mt-2 md:mt-0 flex items-center">
-                          <span className="font-semibold">₹{order.total}</span>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="text-appgold ml-4"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/customer/order/${order.id}`);
-                            }}
+                  {currentOrders.length > 0 && searchFilteredOrders.some(order => 
+                    order.status !== 'delivered' && order.status !== 'cancelled'
+                  ) && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-4">Active Orders</h3>
+                      {searchFilteredOrders
+                        .filter(order => order.status !== 'delivered' && order.status !== 'cancelled')
+                        .map((order) => (
+                          <div 
+                            key={order.id} 
+                            className="app-card p-4 border border-appgray hover:border-appgold transition-colors cursor-pointer mb-4"
+                            onClick={() => navigate(`/customer/order/${order.id}`)}
                           >
-                            Track Order
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        {order.items.map((item, index) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span>{item.productName} × {item.quantity}</span>
-                            <span>₹{item.price * item.quantity}</span>
+                            <div className="flex flex-col md:flex-row justify-between mb-4">
+                              <div>
+                                <div className="flex items-center">
+                                  <h3 className="font-semibold mr-3">{order.id}</h3>
+                                  <span className={`px-2 py-0.5 text-xs rounded-full border ${getStatusColor(order.status)}`}>
+                                    {statusIcons[order.status]}
+                                    <span className="ml-1">{statusLabels[order.status]}</span>
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-400">
+                                  Ordered on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
+                                </p>
+                              </div>
+                              <div className="mt-2 md:mt-0 flex items-center">
+                                <span className="font-semibold">₹{order.total}</span>
+                                <Button 
+                                  variant="default" 
+                                  size="sm" 
+                                  className="text-white ml-4 app-button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/customer/order/${order.id}`);
+                                  }}
+                                >
+                                  Track Order
+                                </Button>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              {order.items.map((item, index) => (
+                                <div key={index} className="flex justify-between text-sm">
+                                  <span>{item.productName} × {item.quantity}</span>
+                                  <span>₹{item.price * item.quantity}</span>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         ))}
-                      </div>
                     </div>
-                  ))}
+                  )}
+                  
+                  {showPastOrders && pastOrders.length > 0 && searchFilteredOrders.some(order => 
+                    order.status === 'delivered' || order.status === 'cancelled'
+                  ) && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">Past Orders</h3>
+                      {searchFilteredOrders
+                        .filter(order => order.status === 'delivered' || order.status === 'cancelled')
+                        .map((order) => (
+                          <div 
+                            key={order.id} 
+                            className="app-card p-4 border border-appgray hover:border-appgold transition-colors cursor-pointer mb-4 opacity-80"
+                            onClick={() => navigate(`/customer/order/${order.id}`)}
+                          >
+                            <div className="flex flex-col md:flex-row justify-between mb-4">
+                              <div>
+                                <div className="flex items-center">
+                                  <h3 className="font-semibold mr-3">{order.id}</h3>
+                                  <span className={`px-2 py-0.5 text-xs rounded-full border ${getStatusColor(order.status)}`}>
+                                    {statusIcons[order.status]}
+                                    <span className="ml-1">{statusLabels[order.status]}</span>
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-400">
+                                  Ordered on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
+                                </p>
+                              </div>
+                              <div className="mt-2 md:mt-0 flex items-center">
+                                <span className="font-semibold">₹{order.total}</span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="ml-4"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/customer/order/${order.id}`);
+                                  }}
+                                >
+                                  View Details
+                                </Button>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              {order.items.map((item, index) => (
+                                <div key={index} className="flex justify-between text-sm">
+                                  <span>{item.productName} × {item.quantity}</span>
+                                  <span>₹{item.price * item.quantity}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="py-12 text-center">

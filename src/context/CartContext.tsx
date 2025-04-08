@@ -11,6 +11,7 @@ interface CartContextType {
   clearCart: () => void;
   total: number;
   itemCount: number;
+  getCartItemQuantity: (productId: string, variantId?: string) => number;
 }
 
 const CartContext = React.createContext<CartContextType | undefined>(undefined);
@@ -37,11 +38,19 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [items]);
   
   const addToCart = (product: Product, quantity: number, variant?: ProductVariant) => {
+    if (quantity <= 0) return;
+    
+    // Check if variant exists and has stock
+    if (variant && variant.stock <= 0) {
+      toast({
+        title: "Out of stock",
+        description: `${product.name} (${variant.weightValue}${variant.weightUnit}) is currently out of stock`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setItems(prevItems => {
-      const cartItemId = variant 
-        ? `${product.id}-${variant.id}`
-        : product.id;
-        
       const existingItemIndex = prevItems.findIndex(item => {
         if (variant && item.variant) {
           return item.product.id === product.id && item.variant.id === variant.id;
@@ -51,11 +60,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (existingItemIndex !== -1) {
         // Item exists, update quantity
-        return prevItems.map((item, index) => 
-          index === existingItemIndex 
-            ? { ...item, quantity: item.quantity + quantity } 
-            : item
-        );
+        const updatedItems = [...prevItems];
+        updatedItems[existingItemIndex] = {
+          ...updatedItems[existingItemIndex],
+          quantity: updatedItems[existingItemIndex].quantity + quantity
+        };
+        return updatedItems;
       } else {
         // Item doesn't exist, add new item
         return [...prevItems, { product, variant, quantity }];
@@ -96,7 +106,19 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ? item.product.id === productId && item.variant.id === variantId
           : item.product.id === productId && !item.variant;
           
-        return isMatch ? { ...item, quantity } : item;
+        if (isMatch) {
+          // Check if variant exists and has enough stock
+          if (item.variant && quantity > item.variant.stock) {
+            toast({
+              title: "Limited stock",
+              description: `Only ${item.variant.stock} items available`,
+              variant: "destructive"
+            });
+            return { ...item, quantity: item.variant.stock };
+          }
+          return { ...item, quantity };
+        }
+        return item;
       })
     );
   };
@@ -107,6 +129,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       title: "Cart cleared",
       description: "All items have been removed from your cart",
     });
+  };
+  
+  const getCartItemQuantity = (productId: string, variantId?: string): number => {
+    const item = items.find(item => {
+      if (variantId && item.variant) {
+        return item.product.id === productId && item.variant.id === variantId;
+      }
+      return item.product.id === productId && !item.variant;
+    });
+    
+    return item ? item.quantity : 0;
   };
   
   const total = items.reduce(
@@ -131,7 +164,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateQuantity, 
         clearCart,
         total,
-        itemCount
+        itemCount,
+        getCartItemQuantity
       }}
     >
       {children}

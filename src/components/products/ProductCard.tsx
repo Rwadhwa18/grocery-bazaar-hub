@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Product, ProductVariant } from '@/lib/types';
-import { ShoppingCart, Plus, Minus, Package, Barcode } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Package, Barcode, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,10 +15,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
     product.variants && product.variants.length > 0 ? product.variants[0] : undefined
   );
+  const [addedToCart, setAddedToCart] = useState(false);
   const { addToCart } = useCart();
 
   const handleAddToCart = () => {
     addToCart(product, quantity, selectedVariant);
+    // Show added confirmation briefly
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
   };
 
   const incrementQuantity = () => setQuantity(prev => prev + 1);
@@ -58,6 +62,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
       : `${product.quantity.toString()} ${product.unit}`;
   };
 
+  const isOutOfStock = (): boolean => {
+    if (selectedVariant) {
+      return selectedVariant.stock <= 0;
+    }
+    return false;
+  };
+
+  const stockMessage = (): string => {
+    if (!selectedVariant) return '';
+    if (selectedVariant.stock <= 0) return 'Out of stock';
+    if (selectedVariant.stock < 5) return `Only ${selectedVariant.stock} left`;
+    return '';
+  };
+
   const discountPercentage = getDiscountPercentage();
 
   return (
@@ -78,6 +96,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
         ) : (
           <Package size={64} className="text-gray-600" />
         )}
+        
+        {product.isVeg !== undefined && (
+          <div 
+            className={`absolute top-2 right-2 w-5 h-5 rounded-sm ${product.isVeg ? 'bg-green-500' : 'bg-red-500'} flex items-center justify-center`}
+          >
+            <div className="w-3 h-3 rounded-sm bg-appbg"></div>
+          </div>
+        )}
       </div>
       
       <div className="p-4">
@@ -88,13 +114,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <p className="text-sm text-gray-400 mb-2 line-clamp-1">{product.description}</p>
         
         {/* Variant selection */}
-        {product.variants && product.variants.length > 0 && (
+        {product.variants && product.variants.length > 1 && (
           <div className="mb-3">
             <Select 
               value={selectedVariant?.id} 
               onValueChange={(value) => {
                 const variant = product.variants.find(v => v.id === value);
                 setSelectedVariant(variant);
+                // Reset quantity when variant changes
+                setQuantity(1);
               }}
             >
               <SelectTrigger className="w-full h-8 text-sm">
@@ -102,8 +130,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
               </SelectTrigger>
               <SelectContent>
                 {product.variants.map((variant) => (
-                  <SelectItem key={variant.id} value={variant.id}>
+                  <SelectItem 
+                    key={variant.id} 
+                    value={variant.id}
+                    disabled={variant.stock <= 0}
+                  >
                     {variant.weightValue} {variant.weightUnit} - ₹{variant.price}
+                    {variant.stock <= 0 && " (Out of stock)"}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -111,7 +144,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         )}
         
-        <div className="flex items-end justify-between mb-3">
+        <div className="flex items-end justify-between mb-2">
           <div>
             <div className="flex items-center gap-2">
               {getCurrentMRP() && getCurrentMRP() !== getCurrentPrice() && (
@@ -129,6 +162,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               onClick={decrementQuantity}
               className="p-1 hover:bg-appgray/50 transition-colors"
               aria-label="Decrease quantity"
+              disabled={isOutOfStock()}
             >
               <Minus size={16} />
             </button>
@@ -137,11 +171,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
               onClick={incrementQuantity}
               className="p-1 hover:bg-appgray/50 transition-colors"
               aria-label="Increase quantity"
+              disabled={isOutOfStock()}
             >
               <Plus size={16} />
             </button>
           </div>
         </div>
+        
+        {stockMessage() && (
+          <div className={`text-xs mb-2 ${
+            selectedVariant && selectedVariant.stock <= 0 
+              ? 'text-red-500' 
+              : 'text-yellow-500'
+          }`}>
+            {stockMessage()}
+          </div>
+        )}
         
         {selectedVariant && selectedVariant.barcode && (
           <div className="flex items-center text-xs text-gray-400 mb-2">
@@ -152,11 +197,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
         
         <Button 
           onClick={handleAddToCart} 
-          className="w-full app-button group-hover:bg-opacity-100"
-          disabled={selectedVariant ? selectedVariant.stock <= 0 : false}
+          className={`w-full ${addedToCart ? 'bg-green-600' : 'app-button'} transition-colors`}
+          disabled={isOutOfStock()}
         >
-          <ShoppingCart size={18} className="mr-2" />
-          {selectedVariant && selectedVariant.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+          {addedToCart ? (
+            <>
+              <Check size={18} className="mr-2" />
+              Added to Cart
+            </>
+          ) : (
+            <>
+              <ShoppingCart size={18} className="mr-2" />
+              {isOutOfStock() ? 'Out of Stock' : 'Add to Cart'}
+            </>
+          )}
         </Button>
       </div>
     </div>

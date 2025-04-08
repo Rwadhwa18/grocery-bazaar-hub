@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Product } from '@/lib/types';
 import ProductList from '@/components/products/ProductList';
@@ -188,11 +189,12 @@ const Shop = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [showFilters, setShowFilters] = useState(false);
   const [discountedOnly, setDiscountedOnly] = useState(false);
+  const standardizedProducts = standardizeProducts(rawMockProducts);
 
   useEffect(() => {
     // Simulate loading delay
     const timer = setTimeout(() => {
-      setFilteredProducts(mockProducts);
+      setFilteredProducts(standardizedProducts);
       setIsLoading(false);
     }, 1500);
 
@@ -201,7 +203,7 @@ const Shop = () => {
 
   useEffect(() => {
     // Filter products based on filters
-    let filtered = [...mockProducts];
+    let filtered = [...standardizedProducts];
     
     // Filter by search term
     if (searchTerm) {

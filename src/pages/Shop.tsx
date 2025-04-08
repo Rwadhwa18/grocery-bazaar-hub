@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Product } from '@/lib/types';
 import ProductList from '@/components/products/ProductList';
@@ -11,9 +10,10 @@ import { Label } from '@/components/ui/label';
 import { Search, SlidersHorizontal, FilterX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { standardizeProducts } from '@/lib/mockData';
 
 // Import from the Index page (in a real app would be from a shared data source)
-const mockProducts: Product[] = [
+const rawMockProducts = [
   {
     id: '1',
     name: 'Ashirvaad Aata',

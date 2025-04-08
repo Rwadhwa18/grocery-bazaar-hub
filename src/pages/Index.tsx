@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,9 +6,10 @@ import ProductList from '@/components/products/ProductList';
 import Navbar from '@/components/ui/layout/Navbar';
 import Footer from '@/components/ui/layout/Footer';
 import { ArrowRight, ShoppingBag, Clock, Award, Truck, MapPin } from 'lucide-react';
+import { standardizeProducts } from '@/lib/mockData';
 
 // Mock products data
-const mockProducts: Product[] = [
+const rawMockProducts = [
   {
     id: '1',
     name: 'Ashirvaad Aata',
@@ -113,6 +113,9 @@ const mockProducts: Product[] = [
     merchantId: 'm2'
   }
 ];
+
+// Convert the raw products to include variants
+const mockProducts: Product[] = standardizeProducts(rawMockProducts);
 
 const categories = [
   { id: 'c1', name: 'Fruits & Vegetables', icon: '🍎' },

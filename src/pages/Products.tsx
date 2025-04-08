@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search } from 'lucide-react';
+import { standardizeProducts } from '@/lib/mockData';
 
 // Mock products data for demonstration
-const mockProducts: Product[] = [
+const rawMockProducts = [
   {
     id: '1',
     name: 'Ashirvaad Aata',
@@ -219,6 +220,9 @@ const mockProducts: Product[] = [
     merchantId: 'm1'
   }
 ];
+
+// Convert the raw products to include variants
+const mockProducts: Product[] = standardizeProducts(rawMockProducts);
 
 // Product categories for filtering
 const categories = [

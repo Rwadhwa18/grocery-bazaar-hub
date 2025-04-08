@@ -29,7 +29,29 @@ const FeaturedProducts = () => {
           category: 'Grocery',
           unit: 'kg',
           quantity: '5',
-          merchantId: 'm1'
+          merchantId: 'm1',
+          variants: [
+            {
+              id: 'v1',
+              barcode: 'AATA5KG',
+              rating: 4.5,
+              weightValue: 5,
+              weightUnit: 'kg',
+              price: 200,
+              mrp: 270,
+              stock: 50
+            },
+            {
+              id: 'v2',
+              barcode: 'AATA10KG',
+              rating: 4.5,
+              weightValue: 10,
+              weightUnit: 'kg',
+              price: 390,
+              mrp: 450,
+              stock: 30
+            }
+          ]
         },
         {
           id: '2',
@@ -42,7 +64,19 @@ const FeaturedProducts = () => {
           category: 'Personal Care',
           unit: 'ml',
           quantity: '100',
-          merchantId: 'm2'
+          merchantId: 'm2',
+          variants: [
+            {
+              id: 'v3',
+              barcode: 'BBLUNT100',
+              rating: 4.2,
+              weightValue: 100,
+              weightUnit: 'ml',
+              price: 300,
+              mrp: 350,
+              stock: 25
+            }
+          ]
         },
         {
           id: '3',
@@ -55,7 +89,19 @@ const FeaturedProducts = () => {
           category: 'Beverages',
           unit: 'N',
           quantity: '60',
-          merchantId: 'm3'
+          merchantId: 'm3',
+          variants: [
+            {
+              id: 'v4',
+              barcode: 'BEV60G',
+              rating: 4.8,
+              weightValue: 60,
+              weightUnit: 'g',
+              price: 239,
+              mrp: 399,
+              stock: 15
+            }
+          ]
         },
         {
           id: '4',
@@ -68,7 +114,29 @@ const FeaturedProducts = () => {
           category: 'Beverages',
           unit: '*',
           quantity: '12',
-          merchantId: 'm1'
+          merchantId: 'm1',
+          variants: [
+            {
+              id: 'v5',
+              barcode: 'BIS1L',
+              rating: 4.0,
+              weightValue: 1,
+              weightUnit: 'L',
+              price: 20,
+              mrp: 22,
+              stock: 100
+            },
+            {
+              id: 'v6',
+              barcode: 'BIS500ML',
+              rating: 4.0,
+              weightValue: 500,
+              weightUnit: 'ml',
+              price: 10,
+              mrp: 12,
+              stock: 150
+            }
+          ]
         }
       ];
       

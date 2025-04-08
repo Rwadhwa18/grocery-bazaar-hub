@@ -21,6 +21,7 @@ import Cart from "./pages/customer/Cart";
 import Orders from "./pages/customer/Orders";
 import OrderTracking from "./pages/customer/OrderTracking";
 import Shop from "./pages/Shop";
+import MerchantInventory from "./pages/merchant/MerchantInventory";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           
           {/* Customer Dashboard Routes */}
           <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/customer/cart" element={<Cart />} />
           <Route path="/customer/orders" element={<Orders />} />
           <Route path="/customer/order/:id" element={<OrderTracking />} />
@@ -49,6 +51,7 @@ const App = () => (
           <Route path="/merchant/category-select" element={<CategorySelect />} />
           <Route path="/merchant/setup" element={<MerchantSetup />} />
           <Route path="/merchant/dashboard" element={<MerchantDashboardPage />} />
+          <Route path="/merchant/inventory" element={<MerchantInventory />} />
           
           {/* Content Pages */}
           <Route path="/products" element={<Products />} />
